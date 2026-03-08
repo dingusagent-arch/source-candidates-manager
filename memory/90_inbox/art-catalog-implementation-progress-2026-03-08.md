@@ -38,8 +38,21 @@ Implemented first hardening slice: **CSRF protection** for admin mutating APIs.
 ### Validation performed
 - Python syntax compile checks passed for edited files via `python3 -m py_compile`.
 
+## Verification pass (post Code Agent run)
+- Confirmed changed files in repo:
+  - `admin_backend/main.py`
+  - `admin_backend/tests/test_admin_save_flow.py`
+  - `admin_backend/scripts/qa_admin_save_smoke.py`
+  - `admin_app/app.js`
+  - `README.md`
+  - `CHANGELOG.md` (new)
+- Ran tests/lint in Linux venv:
+  - `admin_backend/.venv-linux/bin/python -m pytest -q` → **5 passed**
+  - `admin_backend/.venv-linux/bin/python -m ruff check admin_backend/main.py admin_backend/tests/test_admin_save_flow.py` → **passed**
+- Observed warnings:
+  - FastAPI `@app.on_event("startup")` deprecation (non-blocking; future cleanup item).
+
 ## Remaining queue
-1. Expand tests for auth/session/delete-rebuild failure paths.
-2. Improve delete/rebuild failure safety (transaction/rollback semantics).
-3. Add pagination parity improvements for frontend to consume backend paging.
-4. Re-run full lint/tests in proper env (current runtime lacked local pytest/ruff installation in active path).
+1. Frontend/backend pagination parity for large catalogs.
+2. Backup/staging retention policy in `process-report/` to avoid growth.
+3. Optional modernization: migrate startup hook to FastAPI lifespan API.
