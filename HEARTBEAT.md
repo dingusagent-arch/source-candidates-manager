@@ -1,19 +1,15 @@
 # HEARTBEAT.md
 
-# Active project: art-catalog hardening + backlog execution
+# Active project queue is kept minimal. Completed items are archived in memory/90_inbox.
 
-On each heartbeat (unless user says stop), do exactly one focused work block on
-`/home/dingus/Projects/art-catalog-2025` and report concise progress if anything changed.
+# Current work queue: none — heartbeat will be idle until new tasks are added.
 
-Priority queue:
-1. CSRF hardening end-to-end (backend enforcement + frontend header + tests)
-2. Auth/session and destructive-flow test expansion
-3. Delete/rebuild safety improvements (reduce partial-failure risk)
-4. Frontend/backend pagination parity for large catalogs
-5. Produce/update backlog report in `memory/90_inbox/`
+# To add work: append a single-line task under this file. The agent will auto-advance completed items and write a progress note to memory/90_inbox.
 
-Rules:
-- Prefer direct implementation.
-- Do not use Reason Agent unless Mark explicitly approves in that session.
-- If blocked by secrets/sudo/external installs, report blocker clearly.
-- If no actionable change is possible, reply HEARTBEAT_OK.
+# Rules
+- The agent will perform one focused work block per heartbeat and then remove the completed item from this file and write a dated progress note to memory/90_inbox.
+- The agent will not use the Reason Agent unless you explicitly approve in the session.
+- If a task requires privileged actions (sudo, external installs, secrets), the agent will pause and ask for approval.
+
+# If nothing needs attention, the agent replies exactly:
+HEARTBEAT_OK
