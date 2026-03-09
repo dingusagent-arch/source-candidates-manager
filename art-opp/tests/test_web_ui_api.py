@@ -62,3 +62,17 @@ def test_filters(client):
 
     bad = client.post("/api/opportunities/does-not-exist/triage", json={"action": "approve"})
     assert bad.status_code == 404
+
+
+def test_import_sample_route(client):
+    resp = client.post("/api/import-sample")
+    assert resp.status_code == 200
+    payload = resp.get_json()
+    assert payload["total"] > 0
+
+
+def test_import_csv_without_file_falls_back_to_sample(client):
+    resp = client.post("/api/import-csv")
+    assert resp.status_code == 200
+    payload = resp.get_json()
+    assert payload["total"] > 0

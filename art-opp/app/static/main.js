@@ -1,4 +1,23 @@
+const THEME_KEY = 'artopp-theme';
 let selectedId = null;
+
+function applyTheme(theme) {
+  document.body.classList.toggle('dark', theme === 'dark');
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'light';
+  applyTheme(saved);
+
+  const toggle = document.getElementById('theme_toggle');
+  if (!toggle) return;
+  toggle.checked = saved === 'dark';
+  toggle.onchange = () => {
+    const nextTheme = toggle.checked ? 'dark' : 'light';
+    localStorage.setItem(THEME_KEY, nextTheme);
+    applyTheme(nextTheme);
+  };
+}
 
 async function loadItems() {
   const status = document.getElementById('status').value;
@@ -50,7 +69,14 @@ async function triage(action) {
 
 async function importCsv() {
   const input = document.getElementById('csv_file');
-  if (!input.files.length) return alert('Choose a CSV file first.');
+
+  if (!input.files.length) {
+    const sampleRes = await fetch('/api/import-sample', { method: 'POST' });
+    const sampleResult = await sampleRes.json();
+    document.getElementById('import_result').textContent = JSON.stringify(sampleResult);
+    await loadItems();
+    return;
+  }
 
   const form = new FormData();
   form.append('file', input.files[0]);
@@ -60,10 +86,19 @@ async function importCsv() {
   await loadItems();
 }
 
+async function importSample() {
+  const res = await fetch('/api/import-sample', { method: 'POST' });
+  const result = await res.json();
+  document.getElementById('import_result').textContent = JSON.stringify(result);
+  await loadItems();
+}
+
 document.getElementById('refresh').onclick = loadItems;
 document.getElementById('import_btn').onclick = importCsv;
+document.getElementById('import_server_btn').onclick = importSample;
 document.querySelectorAll('[data-action]').forEach((btn) => {
   btn.onclick = () => triage(btn.dataset.action);
 });
 
+initTheme();
 loadItems();

@@ -5,14 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ART-OPP Dashboard</title>
     <style>
-      body { font-family: Arial, sans-serif; margin: 24px; }
+      body { font-family: Arial, sans-serif; margin: 24px; background: #fff; color: #111; }
       .row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
       table { border-collapse: collapse; width: 100%; margin-top: 12px; }
       th, td { border: 1px solid #ddd; padding: 8px; }
       th { background: #f5f5f5; text-align: left; }
       tr:hover { background: #fafafa; cursor: pointer; }
       #detail { margin-top: 16px; padding: 12px; border: 1px solid #ddd; }
-      .btn { padding: 6px 10px; border: 1px solid #bbb; background: #fff; cursor: pointer; }
+      .btn { padding: 6px 10px; border: 1px solid #bbb; background: #fff; color: inherit; cursor: pointer; }
+
+      body.dark { background: #111827; color: #e5e7eb; }
+      body.dark th, body.dark td, body.dark #detail { border-color: #374151; }
+      body.dark th { background: #1f2937; }
+      body.dark tr:hover { background: #1f2937; }
+      body.dark .btn { background: #1f2937; border-color: #4b5563; color: #e5e7eb; }
+      body.dark input, body.dark select { background: #111827; color: #e5e7eb; border: 1px solid #4b5563; }
     </style>
   </head>
   <body>
@@ -36,6 +43,8 @@
     <div class="row">
       <input id="csv_file" type="file" accept=".csv" />
       <button class="btn" id="import_btn">Import CSV</button>
+      <button class="btn" id="import_server_btn">Run server import</button>
+      <label><input id="theme_toggle" type="checkbox" /> Dark mode</label>
       <span id="import_result"></span>
     </div>
 

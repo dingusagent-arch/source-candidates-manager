@@ -12,6 +12,10 @@ def _build_store(app: Flask) -> OpportunityStore:
     return OpportunityStore(Path(app.root_path).parent / app.config["DATA_FILE"])
 
 
+def _sample_csv_path(app: Flask) -> Path:
+    return Path(app.root_path).parent / "src" / "importers" / "examples" / "opportunities.csv"
+
+
 def init_app(app: Flask) -> None:
     @app.get("/")
     def index():
@@ -51,16 +55,24 @@ def init_app(app: Flask) -> None:
     @app.post("/api/import-csv")
     def import_csv():
         file = request.files.get("file")
+        store = _build_store(app)
+
         if not file:
-            return jsonify({"error": "missing file"}), 400
+            summary = store.import_csv(_sample_csv_path(app))
+            return jsonify(summary)
 
         upload_dir = Path(app.root_path).parent / "data" / "uploads"
         upload_dir.mkdir(parents=True, exist_ok=True)
         target = upload_dir / file.filename
         file.save(target)
 
-        store = _build_store(app)
         summary = store.import_csv(target)
+        return jsonify(summary)
+
+    @app.post("/api/import-sample")
+    def import_sample():
+        store = _build_store(app)
+        summary = store.import_csv(_sample_csv_path(app))
         return jsonify(summary)
 
     @app.get("/api/settings")
