@@ -4,6 +4,12 @@ Minimal, non-sensitive repository skeleton for ART-OPP-2026Q2.
 
 ## Included
 
+- **Flask web UI scaffold**
+  - `run_server.py`
+  - `app/__init__.py`, `app/routes.py`, `app/backend.py`
+  - `app/templates/index.html`, `app/static/main.js`
+  - API endpoints for listing/detail/triage/import
+
 - **Storage schema v2**
   - `src/storage/schema_v2.md` (human-readable contract)
   - `src/storage/schema_v2.json` (JSON Schema draft 2020-12)
@@ -33,6 +39,37 @@ python3 src/cli/triage.py reject opp_002 --reason "Deadline passed"
 python3 src/cli/triage.py skip opp_003
 
 python3 src/importers/csv_parser.py src/importers/examples/opportunities.csv
+```
+
+## Web UI
+
+Install minimal deps:
+
+```bash
+python3 -m pip install Flask pytest
+```
+
+Run app:
+
+```bash
+python3 run_server.py
+# or
+FLASK_APP=run_server.py python3 -m flask run
+```
+
+Open `http://localhost:5000`.
+
+### API endpoints
+
+- `GET /api/opportunities?status=&min_score=&search=`
+- `GET /api/opportunities/<id>`
+- `POST /api/opportunities/<id>/triage` with JSON `{ "action": "approve|reject|skip", "note": "..." }`
+- `POST /api/import-csv` with multipart file field `file`
+
+### Tests
+
+```bash
+python3 -m pytest -q
 ```
 
 ## Layout
