@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/art-opp/schema_v2.json",
+  "title": "ART-OPP Opportunity Record v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "source",
+    "deadline",
+    "city",
+    "discipline",
+    "fee_usd",
+    "status"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "source": { "type": "string", "minLength": 1 },
+    "deadline": { "type": "string", "format": "date-time" },
+    "city": { "type": "string" },
+    "discipline": { "type": "string" },
+    "fee_usd": { "type": "number", "minimum": 0 },
+    "status": {
+      "type": "string",
+      "enum": ["new", "approved", "rejected", "skipped"]
+    },
+    "url": { "type": "string", "format": "uri" },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "default": []
+    },
+    "notes": { "type": "string" },
+    "score_total": { "type": "number" },
+    "score_breakdown": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}
