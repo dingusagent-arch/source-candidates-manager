@@ -1,0 +1,4 @@
+id,title,source,deadline,city,discipline,fee_usd,url
+opp_001,Spring Juried Show,ArtCall,2026-04-01T23:59:00Z,Boston,Painting,25,https://example.org/opp/1
+opp_002,Open Studio Grant,CityArts,2026-05-15T17:00:00Z,Providence,Mixed Media,0,https://example.org/opp/2
+opp_003,Regional Emerging Artist Award,TrustedFoundation,2026-03-20T12:00:00Z,New York,Sculpture,60,https://example.org/opp/3
