@@ -14,16 +14,15 @@ def client(tmp_path: Path):
     return app.test_client()
 
 
-def _upload_example_csv(client):
-    csv_path = Path("src/importers/examples/opportunities.csv")
+def _upload_example_csv(client, sample_csv_path):
     data = {
-        "file": (BytesIO(csv_path.read_bytes()), "opportunities.csv"),
+        "file": (BytesIO(sample_csv_path.read_bytes()), "opportunities.csv"),
     }
     return client.post("/api/import-csv", data=data, content_type="multipart/form-data")
 
 
-def test_import_and_list(client):
-    resp = _upload_example_csv(client)
+def test_import_and_list(client, sample_csv_path):
+    resp = _upload_example_csv(client, sample_csv_path)
     assert resp.status_code == 200
     payload = resp.get_json()
     assert payload["total"] > 0
@@ -35,8 +34,8 @@ def test_import_and_list(client):
     assert "score_total" in items[0]
 
 
-def test_detail_and_triage(client):
-    _upload_example_csv(client)
+def test_detail_and_triage(client, sample_csv_path):
+    _upload_example_csv(client, sample_csv_path)
     items = client.get("/api/opportunities").get_json()
     item_id = items[0]["id"]
 
@@ -53,8 +52,8 @@ def test_detail_and_triage(client):
     assert updated["notes"] == "Good fit"
 
 
-def test_filters(client):
-    _upload_example_csv(client)
+def test_filters(client, sample_csv_path):
+    _upload_example_csv(client, sample_csv_path)
 
     filtered = client.get("/api/opportunities?min_score=999")
     assert filtered.status_code == 200
