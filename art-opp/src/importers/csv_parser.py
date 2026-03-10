@@ -26,25 +26,65 @@ REQUIRED_COLUMNS = {
 }
 
 
+# Header map: common variants -> canonical name
+HEADER_ALIASES = {
+    "id": "id",
+    "identifier": "id",
+    "title": "title",
+    "name": "title",
+    "url": "url",
+    "link": "url",
+    "source": "source",
+    "origin": "source",
+    "deadline": "deadline",
+    "due": "deadline",
+    "discipline": "discipline",
+    "category": "discipline",
+    "fee": "fee_usd",
+    "fee_usd": "fee_usd",
+    "city": "city",
+    "location": "city",
+}
+
+
+def _normalize_fieldnames(fieldnames: list[str]) -> dict:
+    """Return a mapping from canonical field -> actual CSV column name."""
+    mapping: dict[str, str] = {}
+    for col in (fieldnames or []):
+        key = col.strip().lower()
+        if key in HEADER_ALIASES:
+            canonical = HEADER_ALIASES[key]
+            mapping[canonical] = col
+    return mapping
+
+
 def parse_rows(csv_path: Path) -> Iterator[Dict[str, object]]:
     with csv_path.open("r", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        missing = REQUIRED_COLUMNS - set(reader.fieldnames or [])
+        fieldnames = reader.fieldnames or []
+        normalized = _normalize_fieldnames(fieldnames)
+        missing = REQUIRED_COLUMNS - set(normalized.keys())
         if missing:
             raise ValueError(f"Missing required CSV columns: {sorted(missing)}")
 
         now = datetime.now(timezone.utc).isoformat()
         for row in reader:
+            try:
+                fee_val = row.get(normalized.get("fee_usd", "fee_usd"), "0")
+                fee = float(fee_val) if fee_val not in (None, "") else 0.0
+            except Exception:
+                fee = 0.0
+
             yield {
-                "id": row["id"].strip(),
-                "title": row["title"].strip(),
-                "source": row["source"].strip(),
-                "deadline": row["deadline"].strip(),
-                "city": row["city"].strip(),
-                "discipline": row["discipline"].strip(),
-                "fee_usd": float(row["fee_usd"]),
+                "id": row[normalized["id"]].strip(),
+                "title": row[normalized["title"]].strip(),
+                "source": row[normalized["source"]].strip(),
+                "deadline": row[normalized["deadline"]].strip(),
+                "city": row[normalized["city"]].strip(),
+                "discipline": row[normalized["discipline"]].strip(),
+                "fee_usd": fee,
                 "status": "new",
-                "url": row["url"].strip(),
+                "url": row[normalized["url"]].strip(),
                 "created_at": now,
                 "updated_at": now,
             }
