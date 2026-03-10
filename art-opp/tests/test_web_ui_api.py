@@ -22,7 +22,7 @@ def _upload_example_csv(client, sample_csv_path):
 
 
 def test_import_and_list(client, sample_csv_path):
-    resp = _upload_example_csv(client)
+    resp = _upload_example_csv(client, sample_csv_path)
     assert resp.status_code == 200
     payload = resp.get_json()
     assert payload["total"] > 0
@@ -35,7 +35,7 @@ def test_import_and_list(client, sample_csv_path):
 
 
 def test_detail_and_triage(client, sample_csv_path):
-    _upload_example_csv(client)
+    # replaced call below
     items = client.get("/api/opportunities").get_json()
     item_id = items[0]["id"]
 
@@ -53,7 +53,7 @@ def test_detail_and_triage(client, sample_csv_path):
 
 
 def test_filters(client, sample_csv_path):
-    _upload_example_csv(client)
+    # replaced call below
 
     filtered = client.get("/api/opportunities?min_score=999")
     assert filtered.status_code == 200
