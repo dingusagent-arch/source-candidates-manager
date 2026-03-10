@@ -8,43 +8,95 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterator
 
 
-REQUIRED_COLUMNS = {
-    "id",
-    "title",
-    "source",
-    "deadline",
-    "city",
-    "discipline",
-    "fee_usd",
-    "url",
+REQUIRED_COLUMNS = {"id", "title", "deadline"}
+
+
+# Header map: common variants -> canonical name
+HEADER_ALIASES = {
+    "id": "id",
+    "identifier": "id",
+    "opportunity_id": "id",
+    "title": "title",
+    "name": "title",
+    "url": "url",
+    "link": "url",
+    "source": "source",
+    "origin": "source",
+    "organization": "source",
+    "org": "source",
+    "deadline": "deadline",
+    "due": "deadline",
+    "due_date": "deadline",
+    "discipline": "discipline",
+    "category": "discipline",
+    "type": "discipline",
+    "fee": "fee_usd",
+    "fee_usd": "fee_usd",
+    "entry_fee": "fee_usd",
+    "city": "city",
+    "location": "city",
 }
+
+
+def _normalized_key(name: str) -> str:
+    return re.sub(r"[\s\-]+", "_", name.strip().lower())
+
+
+def _normalize_fieldnames(fieldnames: list[str]) -> dict[str, list[str]]:
+    """Return mapping from canonical field -> matching CSV column names (in order)."""
+    mapping: dict[str, list[str]] = {}
+    for col in (fieldnames or []):
+        key = _normalized_key(col)
+        if key in HEADER_ALIASES:
+            canonical = HEADER_ALIASES[key]
+            mapping.setdefault(canonical, [])
+            if col not in mapping[canonical]:
+                mapping[canonical].append(col)
+    return mapping
+
+
+def _first_value(row: dict[str, str], candidates: list[str], default: str = "") -> str:
+    for column in candidates:
+        value = row.get(column)
+        if value is not None and str(value).strip() != "":
+            return str(value).strip()
+    return default
 
 
 def parse_rows(csv_path: Path) -> Iterator[Dict[str, object]]:
     with csv_path.open("r", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        missing = REQUIRED_COLUMNS - set(reader.fieldnames or [])
+        fieldnames = reader.fieldnames or []
+        normalized = _normalize_fieldnames(fieldnames)
+        missing = REQUIRED_COLUMNS - set(normalized.keys())
         if missing:
             raise ValueError(f"Missing required CSV columns: {sorted(missing)}")
 
         now = datetime.now(timezone.utc).isoformat()
         for row in reader:
+            fee_text = _first_value(row, normalized.get("fee_usd", []), default="0")
+            try:
+                fee = float(fee_text) if fee_text else 0.0
+            except Exception:
+                fee = 0.0
+
             yield {
-                "id": row["id"].strip(),
-                "title": row["title"].strip(),
-                "source": row["source"].strip(),
-                "deadline": row["deadline"].strip(),
-                "city": row["city"].strip(),
-                "discipline": row["discipline"].strip(),
-                "fee_usd": float(row["fee_usd"]),
+                "id": _first_value(row, normalized["id"]),
+                "title": _first_value(row, normalized["title"]),
+                "source": _first_value(row, normalized.get("source", []), default=""),
+                "deadline": _first_value(row, normalized["deadline"]),
+                "city": _first_value(row, normalized.get("city", []), default=""),
+                "discipline": _first_value(row, normalized.get("discipline", []), default=""),
+                "fee_usd": fee,
                 "status": "new",
-                "url": row["url"].strip(),
+                "url": _first_value(row, normalized.get("url", []), default=""),
                 "created_at": now,
                 "updated_at": now,
             }

@@ -1,4 +1,4 @@
-id,title,source,deadline,city,discipline,fee_usd,url
-opp_001,Spring Juried Show,ArtCall,2026-04-01T23:59:00Z,Boston,Painting,25,https://example.org/opp/1
-opp_002,Open Studio Grant,CityArts,2026-05-15T17:00:00Z,Providence,Mixed Media,0,https://example.org/opp/2
-opp_003,Regional Emerging Artist Award,TrustedFoundation,2026-03-20T12:00:00Z,New York,Sculpture,60,https://example.org/opp/3
+ID,id,title,url,source,deadline,discipline,fee_usd,city,organization,category
+1,1,Public Mural Project,https://example.org/mural,city-listings,2026-04-15,Public Art,0,Springfield,City Arts Council,Public Art
+2,2,Gallery Exhibition,https://example.org/gallery,local-collective,2026-03-30,Exhibition,50,Springfield,Local Artists Collective,Exhibition
+3,3,Artist Residency,https://example.org/residency,national-db,2026-05-01,Residency,0,Capital City,National Arts Foundation,Residency
