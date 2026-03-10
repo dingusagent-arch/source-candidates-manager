@@ -35,7 +35,7 @@ def test_import_and_list(client, sample_csv_path):
 
 
 def test_detail_and_triage(client, sample_csv_path):
-    # replaced call below
+    _upload_example_csv(client, sample_csv_path)
     items = client.get("/api/opportunities").get_json()
     item_id = items[0]["id"]
 
@@ -53,7 +53,7 @@ def test_detail_and_triage(client, sample_csv_path):
 
 
 def test_filters(client, sample_csv_path):
-    # replaced call below
+    _upload_example_csv(client, sample_csv_path)
 
     filtered = client.get("/api/opportunities?min_score=999")
     assert filtered.status_code == 200
